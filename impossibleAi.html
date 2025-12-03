@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic Tac Toe</title>
+  <style>
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* BACKGROUND (Retro Ripple) */
+body {
+  background: radial-gradient(circle at top, #0d0d0d, #000);
+  color: white;
+  text-align: center;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Ripple animation */
+body::before {
+  content: "";
+  position: fixed;
+  width: 480px;
+  height: 480px;
+  border-radius: 50%;
+  background: rgba(255, 0, 85, 0.15);
+  top: 55%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  filter: blur(6px);
+  animation: rippleGlow 7s infinite ease-in-out;
+  z-index: -1;
+}
+@keyframes rippleGlow {
+  0% { transform: translate(-50%, -50%) scale(0.6); }
+  50% { transform: translate(-50%, -50%) scale(1.4); }
+  100% { transform: translate(-50%, -50%) scale(0.6); }
+}
+
+/* TITLE */
+h1 {
+  font-size: 60px;
+  color: #ff0055;
+  text-shadow: 0 0 15px #ff0055, 0 0 25px #ff4d99;
+  font-weight: 800;
+  margin-top: 20px;
+  animation: glowPulse 3s infinite alternate;
+}
+@keyframes glowPulse {
+  from { text-shadow: 0 0 10px #ff1a66; }
+  to   { text-shadow: 0 0 30px #ff66aa; }
+}
+
+/* TURN INDICATOR */
+#turn {
+  font-size: 26px;
+  color: #ff66aa;
+  text-shadow: 0 0 10px #ff1a75;
+}
+
+/* MAIN CONTAINER */
+.container {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* GLOWING ANIMATED BORDER AROUND BOARD */
+.game-wrapper {
+  padding: 18px;
+  border-radius: 25px;
+  background: #111;
+  position: relative;
+  box-shadow: 0 0 18px #ff0055;
+  animation: borderPulse 2.8s infinite alternate;
+}
+@keyframes borderPulse {
+  from { box-shadow: 0 0 18px #ff0055; }
+  to   { box-shadow: 0 0 35px #ff3399; }
+}
+
+/* GAME BOARD */
+.game {
+  height: 58vmin;
+  width: 58vmin;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2vmin;
+}
+
+/* GRID CELLS */
+.box {
+  height: 16vmin;
+  width: 16vmin;
+  background: #1c1c1c;
+  border-radius: 12px;
+  font-size: 8vmin;
+  color: #ff0055;
+  border: none;
+  box-shadow: 0 0 15px #ff005544;
+  transition: transform 0.2s, background 0.2s;
+  cursor: pointer;
+}
+
+.box:hover {
+  transform: scale(1.08);
+  background: #2b2b2b;
+  box-shadow: 0 0 20px #ff3399;
+}
+
+/* WINNING CELLS ANIMATION */
+.win {
+  background: #ff0055 !important;
+  color: white !important;
+  box-shadow: 0 0 25px #ff66aa !important;
+  animation: winFlash 0.4s alternate infinite;
+}
+@keyframes winFlash {
+  from { box-shadow: 0 0 25px #ff66aa; }
+  to   { box-shadow: 0 0 50px #ff1a75; }
+}
+
+/* RETRO WINNER MESSAGE */
+#msg {
+  font-size: 55px;
+  color: #ff66aa;
+  text-shadow: 0 0 15px #ff4d99;
+  animation: winnerPulse 1.3s infinite alternate;
+}
+@keyframes winnerPulse {
+  from { transform: scale(1); opacity: 0.7; }
+  to   { transform: scale(1.15); opacity: 1; }
+}
+
+/* MESSAGE OVERLAY */
+.msg-container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+/* BUTTONS */
+#reset,
+#new-btn {
+  padding: 1rem 2rem;
+  font-size: 1.3rem;
+  border-radius: 1rem;
+  border: none;
+  cursor: pointer;
+  color: white;
+  box-shadow: 0 0 15px #ff005544;
+  transition: 0.3s;
+}
+
+#reset {
+  background: #ff0055;
+}
+#new-btn {
+  background: #0078ff;
+}
+
+#reset:hover,
+#new-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 25px #ff66aa;
+}
+
+/* CONFETTI PARTICLES ON WIN */
+.confetti {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ff0055;
+  box-shadow: 0 0 10px #ff66aa;
+  animation: fall 1.6s linear forwards;
+}
+@keyframes fall {
+  to {
+    transform: translateY(95vh) translateX(20px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* HIDING */
+.hide {
+  display: none;
+}
+
+/********* MOBILE **********/
+@media (max-width: 600px) {
+  h1 { font-size: 44px; }
+  #turn { font-size: 18px; }
+
+  .game {
+    width: 78vmin;
+    height: 78vmin;
+    gap: 3vmin;
+  }
+
+  .box {
+    width: 23vmin;
+    height: 23vmin;
+    font-size: 11vmin;
+  }
+
+  #msg { font-size: 40px; }
+}
+
+/* FULL SCREEN INTRO */
+#startScreen {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at center, #15000d, #000);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* LET'S PLAY TEXT */
+.start-text {
+  font-size: 60px;
+  font-weight: 800;
+  margin-bottom: 20px;
+  color: #ff0055;
+  text-shadow: 0 0 15px #ff0055, 0 0 30px #ff3380;
+  animation: pulseGlow 2s infinite alternate;
+}
+
+/* TAP TO START */
+.tap-text {
+  font-size: 26px;
+  margin-bottom: 40px;
+  opacity: 0.85;
+  color: #ff66aa;
+  animation: blink 1.4s infinite;
+}
+
+/* Countdown number */
+.count {
+  font-size: 100px;
+  font-weight: 900;
+  color: #ff0055;
+  text-shadow: 0 0 30px #ff1a75, 0 0 50px #ff66aa;
+  animation: countPop 0.5s ease;
+}
+
+.hide { display: none; }
+
+/* Animations */
+@keyframes blink {
+  0%,100% { opacity: 0.3; }
+  50%     { opacity: 1; }
+}
+
+@keyframes pulseGlow {
+  from { text-shadow: 0 0 15px #ff0055; }
+  to   { text-shadow: 0 0 40px #ff66aa; }
+}
+
+@keyframes countPop {
+  0%   { transform: scale(0.5); opacity: 0; }
+  80%  { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  .start-text { font-size: 40px; }
+  .tap-text { font-size: 18px; }
+  .count { font-size: 70px; }
+}
+
+@media (max-width: 350px) {
+  .start-text { font-size: 32px; }
+  .tap-text { font-size: 16px; }
+  .count { font-size: 55px; }
+}
+
+  </style>
+</head>
+<body>
+  <!-- FULL SCREEN START SCREEN -->
+<div id="startScreen">
+  <h1 class="start-text glow">LET'S PLAY!</h1>
+  <p class="tap-text glow">Tap to Start</p>
+
+  <!-- Countdown (hidden initially) -->
+  <div id="countdown" class="count hide">3</div>
+</div>
+
+<!-- SOUND EFFECTS -->
+<audio id="beep" src="beep.mp3"></audio>
+<audio id="goSound" src="go.mp3"></audio>
+
+  <h1>Tic Tac Toe </h1>
+   <div class="msg-container hide">
+    <p id="msg">Winner</p>
+    <button id="new-btn">New Game </button>
+  </div>
+  <div class="container">
+    <div class="game">
+      <button class="box"></button>
+      <button class="box"></button>
+      <button class="box"></button>
+      <button class="box"></button>
+      <button class="box"></button>
+      <button class="box"></button>
+      <button class="box"></button>
+      <button class="box"></button>
+      <button class="box"></button>
+    </div>
+  </div>  
+
+  <h3 id="turn"></h3>
+  <button id="reset">Reset</button>  
+  <audio  id="clickSound" src="click.mp3"></audio>
+  <audio  id="fireSound" src="fire.mp3"></audio>
+  <audio  id="winSound" src="win.mp3"></audio>
+  <audio  id="loseSound" src="lose.mp3"></audio>
+  <audio  id="restartSound" src="restart.mp3"></audio>
+   <audio  id="drawSound" src="draw.mp3"></audio>
+   <audio  id="laughSound" src="laugh.mp3"></audio>
+
+<script>
+  const startScreen = document.getElementById("startScreen");
+  const countBox = document.getElementById("countdown");
+
+  const beep = document.getElementById("beep");
+  const goSound = document.getElementById("goSound");
+
+  /* ---------------------------------------
+      ASYNC FUNCTION: Wait for start + countdown
+  ---------------------------------------- */
+  function waitForStart() {
+    return new Promise(resolve => {
+
+      const tapToStart = document.querySelector(".tap-text");
+      const startText = document.querySelector(".start-text");
+
+      // User taps screen to begin
+      startScreen.addEventListener("click", () => {
+        // Hide texts
+        tapToStart.style.display = "none";
+        startText.style.display = "none";
+
+        // Start countdown
+        let count = 3;
+        countBox.innerText = count;
+        countBox.classList.remove("hide");
+
+        const interval = setInterval(() => {
+          beep.play();
+          count--;
+
+          if (count > 0) {
+            countBox.innerText = count;
+          } else {
+            clearInterval(interval);
+
+            // GO!
+            countBox.innerText = "GO!";
+            goSound.play();
+
+            // Fade out screen
+            setTimeout(() => {
+              startScreen.style.opacity = "0";
+              startScreen.style.transition = "0.6s ease";
+
+              setTimeout(() => {
+                startScreen.style.display = "none";
+
+                // FINALLY RESOLVE → GAME CAN START
+                resolve();
+              }, 600);
+
+            }, 500);
+          }
+
+        }, 1000);
+      }, { once: true });
+
+    });
+  }
+
+  /* ---------------------------------------
+      MAIN GAME START (async)
+  ---------------------------------------- */
+  async function initGame() {
+    console.log("Waiting for intro...");
+    
+    // ⏳ Wait here until countdown completes
+    await waitForStart();
+
+    console.log("Countdown finished. Game starting now!");
+
+    // ⭐ ALL your game code goes here
+    // Example:
+    // enable clicking boxes
+    // reset board
+    // set turn
+    startActualGame();  
+  }
+
+  // Dummy function — replace with your own game logic
+  function startActualGame() {
+   
+let boxes = document.querySelectorAll(".box");
+let resetBtn = document.querySelector("#reset");
+let newBtn = document.querySelector("#new-btn");
+let msgContainer = document.querySelector(".msg-container");
+let msg = document.querySelector("#msg");
+let chance = document.querySelector("#turn");
+let clickSound = document.querySelector('#clickSound');
+let fireSound = document.querySelector('#fireSound');
+let winSound = document.querySelector('#winSound');
+let loseSound = document.querySelector('#loseSound');
+let restartSound = document.querySelector('#restartSound');
+let laughSound = document.querySelector('#laughSound');
+
+
+let turnO = true; //playerX playerO
+let clickCount = 0; 
+
+const winPattern=[
+  [0,1,2],
+  [0,3,6],
+  [0,4,8],
+  [1,4,7],
+  [2,5,8],
+  [3,4,5],
+  [6,7,8],
+  [2,4,6]
+]
+
+const resetGame = () => {
+  turnO;
+  enableBoxs();
+  clickCount = 0;
+  restartSound.play();
+  firstChance();
+  msgContainer.classList.add("hide");
+}
+
+const firstChance = () =>{
+   
+    turnO= true;
+    chance.innerText = `😎 Let me do a favour.
+    After all you will Lose
+                           ........🤖`;
+      setTimeout(() =>{
+      chance.innerText = ` 🧍‍♂️ Your Chance`;
+    },3000);
+    
+  }
+ firstChance();
+
+//Adding Event Listener to all boxes using for each
+ boxes.forEach((box) => {
+  firstChance();
+  box.addEventListener("click",() =>{
+    if(turnO){
+      box.innerText = "O";
+      clickSound.play();
+      turnO=false;
+      clickCount++;
+      chance.innerText = `🤖 Computer Thinking....`;
+    }
+    box.disabled = true;
+    checkWinner();
+    checkDraw();
+
+    setTimeout(()=>{
+      if(!turnO){
+      aiMove();
+      clickSound.play();
+      turnO = true;
+      clickCount++;
+      chance.innerText = ` 🧍‍♂️ Your Chance`;
+      checkWinner();
+      checkDraw();
+    }
+    },2000)
+  })
+});
+
+
+const aiMove = () =>{
+ let aiPlayed = false; 
+
+const pattern1 = ()=>{
+// Second win move 
+  if(!aiPlayed){
+     for (let pattern of winPattern){
+   let pos1Val = boxes[pattern[0]].innerText.trim();
+   let pos2Val = boxes[pattern[1]].innerText.trim();
+   let pos3Val = boxes[pattern[2]].innerText.trim();
+
+    if((pos1Val.trim() === 'X' && pos2Val.trim() === '')||
+       (pos1Val.trim() === '' && pos2Val.trim() === 'X'))
+       {
+         if(pos1Val.trim() === ''){
+     boxes[pattern[0]].innerText = 'X';
+       boxes[pattern[0]].disabled = true;
+      aiPlayed = true;
+      break;
+        }
+        if(pos2Val.trim() === ''){
+      boxes[pattern[1]].innerText = 'X';
+      boxes[pattern[1]].disabled = true;
+      aiPlayed = true;
+       break;
+        }
+       }
+     }
+    }
+
+  // Last move to win for Ai
+     for (let pattern of winPattern){
+   let pos1Val = boxes[pattern[0]].innerText.trim();
+   let pos2Val = boxes[pattern[1]].innerText.trim();
+   let pos3Val = boxes[pattern[2]].innerText.trim();
+
+  if((pos1Val.trim() === 'X' && pos2Val.trim() === 'X' && pos3Val.trim() === '') ||
+       (pos1Val.trim() === 'X' && pos2Val.trim() === '' && pos3Val.trim() === 'X')||
+       (pos1Val.trim() === '' && pos2Val.trim() === 'X' && pos3Val.trim() === 'X')){
+       if(pos1Val.trim() === ''){
+     boxes[pattern[0]].innerText = 'X';
+       boxes[pattern[0]].disabled = true;
+      aiPlayed = true;
+      break;
+        }
+        if(pos2Val.trim() === ''){
+      boxes[pattern[1]].innerText = 'X';
+      boxes[pattern[1]].disabled = true;
+      aiPlayed = true;
+       break;
+        }
+        if(pos3Val.trim() === ''){
+      boxes[pattern[2]].innerText = 'X';
+        boxes[pattern[2]].disabled = true;
+        aiPlayed = true;
+      break;
+        } 
+      }    
+    }
+
+ //Block Move of Ai 
+   if(!aiPlayed){
+ for (let pattern of winPattern){
+   let pos1Val = boxes[pattern[0]].innerText.trim();
+   let pos2Val = boxes[pattern[1]].innerText.trim();
+   let pos3Val = boxes[pattern[2]].innerText.trim();
+
+  if((pos1Val.trim() === 'O' && pos2Val.trim() === 'O' && pos3Val.trim() === '') ||
+       (pos1Val.trim() === 'O' && pos2Val.trim() === '' && pos3Val.trim() === 'O')||
+       (pos1Val.trim() === '' && pos2Val.trim() === 'O' && pos3Val.trim() === 'O')){
+       if(pos1Val.trim() === ''){
+     boxes[pattern[0]].innerText = 'X';
+       boxes[pattern[0]].disabled = true;
+      aiPlayed = true;
+      break;
+        }
+        if(pos2Val.trim() === ''){
+      boxes[pattern[1]].innerText = 'X';
+      boxes[pattern[1]].disabled = true;
+      aiPlayed = true;
+       break;
+        }
+        if(pos3Val.trim() === ''){
+      boxes[pattern[2]].innerText = 'X';
+        boxes[pattern[2]].disabled = true;
+        aiPlayed = true;
+      break;
+        } 
+      }    
+    }
+    }
+} 
+
+const pattern2 = () =>{
+    if(!aiPlayed){
+ for (let pattern of winPattern){
+   let pos1Val = boxes[pattern[0]].innerText.trim();
+   let pos2Val = boxes[pattern[1]].innerText.trim();
+   let pos3Val = boxes[pattern[2]].innerText.trim();
+
+  if((pos1Val.trim() === 'O' && pos2Val.trim() === 'O' && pos3Val.trim() === '') ||
+       (pos1Val.trim() === 'O' && pos2Val.trim() === '' && pos3Val.trim() === 'O')||
+       (pos1Val.trim() === '' && pos2Val.trim() === 'O' && pos3Val.trim() === 'O')){
+       if(pos1Val.trim() === ''){
+     boxes[pattern[0]].innerText = 'X';
+       boxes[pattern[0]].disabled = true;
+      aiPlayed = true;
+      break;
+        }
+        if(pos2Val.trim() === ''){
+      boxes[pattern[1]].innerText = 'X';
+      boxes[pattern[1]].disabled = true;
+      aiPlayed = true;
+       break;
+        }
+        if(pos3Val.trim() === ''){
+      boxes[pattern[2]].innerText = 'X';
+        boxes[pattern[2]].disabled = true;
+        aiPlayed = true;
+      break;
+        } 
+      }    
+    }
+    }
+
+     // Last move to win for Ai
+     for (let pattern of winPattern){
+   let pos1Val = boxes[pattern[0]].innerText.trim();
+   let pos2Val = boxes[pattern[1]].innerText.trim();
+   let pos3Val = boxes[pattern[2]].innerText.trim();
+
+  if((pos1Val.trim() === 'X' && pos2Val.trim() === 'X' && pos3Val.trim() === '') ||
+       (pos1Val.trim() === 'X' && pos2Val.trim() === '' && pos3Val.trim() === 'X')||
+       (pos1Val.trim() === '' && pos2Val.trim() === 'X' && pos3Val.trim() === 'X')){
+       if(pos1Val.trim() === ''){
+     boxes[pattern[0]].innerText = 'X';
+       boxes[pattern[0]].disabled = true;
+      aiPlayed = true;
+      break;
+        }
+        if(pos2Val.trim() === ''){
+      boxes[pattern[1]].innerText = 'X';
+      boxes[pattern[1]].disabled = true;
+      aiPlayed = true;
+       break;
+        }
+        if(pos3Val.trim() === ''){
+      boxes[pattern[2]].innerText = 'X';
+        boxes[pattern[2]].disabled = true;
+        aiPlayed = true;
+      break;
+        } 
+      }    
+    }
+
+    // Second win move 
+  if(!aiPlayed){
+     for (let pattern of winPattern){
+   let pos1Val = boxes[pattern[0]].innerText.trim();
+   let pos2Val = boxes[pattern[1]].innerText.trim();
+   let pos3Val = boxes[pattern[2]].innerText.trim();
+
+    if((pos1Val.trim() === 'X' && pos2Val.trim() === '')||
+       (pos1Val.trim() === '' && pos2Val.trim() === 'X'))
+       {
+         if(pos1Val.trim() === ''){
+     boxes[pattern[0]].innerText = 'X';
+       boxes[pattern[0]].disabled = true;
+      aiPlayed = true;
+      break;
+        }
+        if(pos2Val.trim() === ''){
+      boxes[pattern[1]].innerText = 'X';
+      boxes[pattern[1]].disabled = true;
+      aiPlayed = true;
+       break;
+        }
+       }
+     }
+    }
+}
+// Pattern Selection 
+ let random= Math.random() * 2;
+     if(random <= 1){
+      pattern1();
+     }
+     else{
+      pattern2();
+     }
+
+// First move 
+   if(!aiPlayed){
+    if(boxes[4].innerText.trim() === ''){
+      boxes[4].innerText = 'X'
+    }
+    else{
+       for(let box of boxes){
+   if(box.innerText.trim() === ''){
+      box.innerText = 'X';
+      return;
+   }
+   }
+  }
+    }
+  }
+  
+
+   
+
+const disableBoxs = () => {
+  for(let box of boxes){
+    box.disabled = true;
+  }
+}
+
+const enableBoxs = () => {
+  for(let box of boxes){
+    box.disabled = false;
+    box.innerText = "";
+  }
+}
+
+
+const showWinner = (winner) =>{
+  setTimeout(() =>{
+    if(winner === 'O'){
+  msg.innerText = `Congratulations, Winner is You`;
+  msgContainer.classList.remove("hide");
+  disableBoxs();
+  }
+  else{
+     msg.innerText = ` 😎😆 You Lost 
+          😈 Don't you understand the meaning of "Impossible" 😜☠`;
+      loseSound.play();
+      laughSound.play();
+     msgContainer.classList.remove("hide");
+     disableBoxs();
+  }
+  },1000);
+  
+}
+
+const checkWinner = () =>{
+  for (let pattern of winPattern){
+   let pos1Val = boxes[pattern[0]].innerText.trim();
+   let pos2Val = boxes[pattern[1]].innerText.trim();
+   let pos3Val = boxes[pattern[2]].innerText.trim();
+    if (pos1Val!="" && pos2Val!="" && pos3Val!="") {
+      if(pos1Val===pos2Val  &&  pos2Val===pos3Val){
+      showWinner(pos1Val);
+      }
+    }
+  }
+};
+
+const checkDraw = () =>{
+ if(clickCount === 9){
+   msg.innerText = `Match Draw`;
+  msgContainer.classList.remove("hide");
+  disableBoxs();
+ }
+};
+
+newBtn.addEventListener("click",resetGame);
+resetBtn.addEventListener("click",resetGame);
+  }
+
+  // Run intro
+  initGame();
+</script>
+
+
+
+</body>
+</html>

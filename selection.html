@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tic Tac Toe</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top, #141414, #000000);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      color: white;
+      padding: 20px;
+      animation: fadeIn 1s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .container {
+      width: 95%;
+      max-width: 450px;
+    }
+
+    h1 {
+      font-size: 50px;
+      margin-bottom: 25px;
+      color: #ff0055;
+      text-shadow: 0 0 15px #ff0055;
+      animation: glow 3s infinite alternate;
+    }
+
+    @keyframes glow {
+      from {
+        text-shadow: 0 0 10px #d40044;
+      }
+      to {
+        text-shadow: 0 0 22px #ff008c;
+      }
+    }
+
+    .btn,
+    .button {
+      width: 100%;
+      padding: 16px;
+      margin: 10px 0;
+      font-size: 22px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      background: #ff0055;
+      color: white;
+      transition: 0.25s;
+      box-shadow: 0 0 12px #ff0055;
+    }
+
+    .button {
+      width: 65%;
+    }
+
+    .btn:hover,
+    .button:hover {
+      transform: scale(1.06);
+      box-shadow: 0 0 22px #ff008c;
+    }
+
+    .btn:active,
+    .button:active {
+      transform: scale(0.9);
+    }
+
+    /* Difficulty Section */
+    #difficultyBox {
+      margin-top: 10px;
+      display: none;
+      animation: slideDown 0.4s ease forwards;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-15px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Game Rules */
+    .rules-box {
+      background: #1b1b1b;
+      padding: 20px;
+      margin-top: 25px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px #ff005520;
+      text-align: left;
+      animation: fadeIn 1.2s ease;
+    }
+
+    .rules-title {
+      color: #ff66aa;
+      font-size: 28px;
+      margin-bottom: 10px;
+      text-shadow: 0 0 15px #ff1a75;
+      text-align: center;
+    }
+
+    .rules-box p {
+      font-size: 17px;
+      margin: 8px 0;
+      line-height: 1.4;
+      color: #ddd;
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 40px;
+      }
+      .btn,
+      .button {
+        font-size: 18px;
+        padding: 14px;
+      }
+      .rules-box p {
+        font-size: 15px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Tic Tac Toe</h1>
+
+    <!-- Main Options -->
+    <button class="btn" id="friendBtn" onclick="location.href='twoPlayer.html'">
+      Friends
+    </button>
+
+    <button class="btn" onclick="showDifficulty()">
+      Computer
+    </button>
+
+    <!-- Difficulty Options (Hidden) -->
+    <div id="difficultyBox">
+      <button class="button" onclick="location.href='easyAi.html'">Easy</button>
+      <button class="button" onclick="location.href='hardAi.html'">Hard</button>
+      <button class="button" onclick="location.href='impossibleAi.html'">Impossible</button>
+    </div>
+
+    <!-- RULES -->
+    <div class="rules-box">
+      <h2 class="rules-title">How to Play</h2>
+      <p>• The game is played on a 3×3 grid.</p>
+      <p>• Player 1 is <b>O</b> and Player 2 or Computer is <b>X</b>.</p>
+      <p>• Players take turns placing their symbol in an empty box.</p>
+      <p>• The first to get 3 in a row (horizontal, vertical, or diagonal) wins.</p>
+      <p>• If all 9 boxes fill without a winner, the game ends in a draw.</p>
+      <p>Note: Some Rules do not apply on impossible level to increase the difficulty of the game </p>
+    </div>
+  </div>
+
+  <script>
+    function showDifficulty() {
+      // Show difficulty menu
+      document.getElementById("difficultyBox").style.display = "block";
+
+      // Hide Friends button
+      document.getElementById("friendBtn").style.display = "none";
+    }
+  </script>
+</body>
+</html>

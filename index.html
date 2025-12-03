@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RetroPlay</title>
+
+  <style>
+    *{
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body{
+      background: radial-gradient(circle at top, #1a1a1a, #000000);
+      color: white;
+      overflow-x: hidden;
+      opacity: 0;
+      animation: fadeIn 1.6s forwards;
+    }
+
+    /* Page Fade-in */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Ripple */
+    .ripple {
+      position: fixed;
+      width: 400px;
+      height: 400px;
+      background: rgba(255, 0, 85, 0.15);
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      animation: ripple 6s infinite ease-out;
+      z-index: -1;
+    }
+    @keyframes ripple {
+      0%   { transform: translate(-50%, -50%) scale(0.4);}
+      50%  { transform: translate(-50%, -50%) scale(1.2);}
+      100% { transform: translate(-50%, -50%) scale(0.4);}
+    }
+
+    /* NAVBAR */
+    nav {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      padding: 20px 30px;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.4);
+      position: fixed;
+      top: 0;
+      backdrop-filter: blur(6px);
+      z-index: 10;
+    }
+
+    nav h1 {
+      font-size: 30px;
+      color: #ff0055;
+      font-weight: 800;
+      text-shadow: 0 0 10px #ff0055;
+    }
+
+    nav ul {
+      display: flex;
+      gap: 30px;
+      list-style: none;
+    }
+
+    nav ul li a {
+      text-decoration: none;
+      color: white;
+      font-size: 18px;
+      transition: 0.2s;
+    }
+
+    nav ul li a:hover {
+      color: #ff0055;
+    }
+
+    /* Hamburger Icon */
+    .hamburger {
+      display: none;
+      font-size: 30px;
+      cursor: pointer;
+    }
+
+    /* Mobile Menu */
+    .mobile-menu {
+      display: none;
+      flex-direction: column;
+      background: #111;
+      width: 100%;
+      padding: 20px;
+      gap: 15px;
+    }
+
+    .mobile-menu a {
+      color: white;
+      font-size: 20px;
+      text-decoration: none;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 140px 20px 60px;
+    }
+
+    .title {
+      font-size: 70px;
+      font-weight: 800;
+      letter-spacing: 5px;
+      color: #ff0055;
+      text-shadow: 0 0 20px #ff0055;
+      animation: glow 3s infinite alternate;
+    }
+
+    @keyframes glow {
+      from { text-shadow: 0 0 10px #ff0055; }
+      to   { text-shadow: 0 0 30px #ff008c; }
+    }
+
+    .subtitle {
+      margin-top: 10px;
+      font-size: 24px;
+      opacity: 0.9;
+    }
+
+    .btn {
+      background: #ff0055;
+      padding: 15px 40px;
+      border-radius: 50px;
+      color: white;
+      font-size: 20px;
+      margin-top: 40px;
+      display: inline-block;
+      cursor: pointer;
+      text-decoration: none;
+      transition: 0.2s;
+    }
+
+    .btn:active { transform: scale(0.9); }
+
+    /* ICON Animations */
+    .icon {
+      position: absolute;
+      width: 80px;
+      opacity: 0.8;
+      animation-duration: 10s;
+      animation-iteration-count: infinite;
+      animation-timing-function: linear;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    .icon:active { transform: scale(1.4) rotate(10deg); }
+
+    .leftToRight { animation-name: moveLR; }
+    .rightToLeft { animation-name: moveRL; }
+
+    @keyframes moveLR {
+      0% { transform: translateX(-200px); }
+      100% { transform: translateX(120vw); }
+    }
+
+    @keyframes moveRL {
+      0% { transform: translateX(120vw); }
+      100% { transform: translateX(-200px); }
+    }
+
+    /* GAME GRID */
+    .games {
+      padding: 40px 20px;
+      text-align: center;
+    }
+
+    .games h2 {
+      font-size: 35px;
+      color: #ff0055;
+      margin-bottom: 30px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: #111;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 0 10px #ff005566;
+      transition: .3s;
+      cursor: pointer;
+    }
+
+    .card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px #ff0055;
+    }
+
+    .card img {
+      width: 80px;
+    }
+
+    .card p {
+      margin-top: 10px;
+      font-size: 18px;
+    }
+
+    /* Music Button */
+    .music-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #ff0055;
+      padding: 10px 20px;
+      border-radius: 40px;
+      cursor: pointer;
+      font-size: 18px;
+      z-index: 15;
+    }
+
+    /* Footer */
+    footer{
+      margin-top: 80px;
+      padding: 30px;
+      background: #111;
+      color: #bbb;
+      text-align: center;
+      font-size: 18px;
+      border-top: 2px solid #ff0055;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+
+      nav ul { display: none; }
+      .hamburger { display: block; }
+
+      .title { font-size: 45px; }
+      .subtitle { font-size: 18px; }
+
+      .icon { width: 55px; }
+
+      .music-btn {
+        top: 15px;
+        right: 15px;
+        font-size: 15px;
+        padding: 8px 15px;
+      }
+    }
+
+    @media (max-width: 480px) {
+
+      .title { font-size: 35px; }
+      .subtitle { font-size: 16px; }
+      .icon { width: 45px; }
+
+      .music-btn {
+        font-size: 13px;
+        padding: 6px 12px;
+        top: 12px;
+        right: 12px;
+      }
+    }
+    a{
+        text-decoration: none;
+        color: aliceblue;
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- Background Music -->
+  <audio id="bgMusic" loop autoplay muted>
+    <source src="music.mp3" type="audio/mpeg">
+  </audio>
+
+  <div class="music-btn" onclick="toggleMusic()">🔊 Music On</div>
+
+  <div class="ripple"></div>
+
+  <!-- NAVBAR -->
+  <nav>
+    <h1>RetroPlay</h1>
+
+    <ul>
+      <li><a href="#">Home</a></li>
+      <li><a href="#games">Games</a></li>
+      <li><a href="#">About</a></li>
+    </ul>
+
+    <div class="hamburger" onclick="toggleMenu()">☰</div>
+  </nav>
+
+  <!-- MOBILE MENU -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#">Home</a>
+    <a href="#games">Games</a>
+    <a href="#">About</a>
+  </div>
+
+  <!-- FLOATING ICONS -->
+  <img src="https://img.icons8.com/emoji/96/joystick.png" class="icon leftToRight" style="top:10%;">
+  <img src="https://img.icons8.com/emoji/96/cross-mark-emoji.png" class="icon rightToLeft" style="top:25%;">
+  <img src="https://img.icons8.com/emoji/96/large-blue-circle.png" class="icon leftToRight" style="top:40%;">
+  <img src="https://img.icons8.com/color/96/dice.png" class="icon rightToLeft" style="top:60%;">
+  <img src="https://img.icons8.com/color/96/rock.png" class="icon leftToRight" style="top:75%;">
+  <img src="https://img.icons8.com/color/96/hand-scissors.png" class="icon rightToLeft" style="top:85%;">
+
+  <!-- HERO -->
+  <div class="hero">
+    <h1 class="title">RetroPlay</h1>
+    <p class="subtitle">Play classic games with a retro touch!</p>
+    <a  href="selection.html"   class="btn">Start Playing</a>
+  </div>
+
+  <!-- GAME GRID -->
+  <section class="games" id="games">
+    <h2>Choose Your Game</h2>
+
+    <div class="grid">
+
+         <a href="selection.html">
+      <div class="card">
+      <img src="Tic Tac Toe.jpeg">
+        <p>Tic Tac Toe</p>
+      </div></a>
+
+      <div class="card">
+        <img src="ludo.jpeg">
+        <p>Ludo</p>
+      </div>
+
+      <div class="card">
+        <img src="rock.jpeg">
+        <p>Stone Paper Scissors</p>
+      </div>
+
+      <div class="card">
+        <img src="bingo.jpeg">
+        <p>Bingo</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    © 2025 RetroPlay — All Rights Reserved | Designed with ❤️ by Yusuf
+  </footer>
+
+ <script>
+  // Select elements
+  const music = document.getElementById("bgMusic");
+  const btn = document.querySelector(".music-btn");
+
+  // Track playing state
+  let playing = false;
+
+  /* ---------------------------
+      AUTOPLAY (muted allowed)
+  --------------------------- */
+  window.addEventListener("load", () => {
+    music.play().catch(() => {});
+  });
+
+  /* ---------------------------
+      UNMUTE ON FIRST INTERACTION
+  --------------------------- */
+  const enableSound = () => {
+    music.muted = false;
+    music.play().catch(() => {});
+    playing = true;
+    btn.innerHTML = "🔊 Music On";
+
+    document.removeEventListener("click", enableSound);
+    document.removeEventListener("touchstart", enableSound);
+  };
+
+  document.addEventListener("click", enableSound, { once: true });
+  document.addEventListener("touchstart", enableSound, { once: true });
+
+  /* ---------------------------
+      TOGGLE MUSIC BUTTON
+  --------------------------- */
+  function toggleMusic() {
+    if (playing) {
+      music.pause();
+      playing = false;
+      btn.innerHTML = "🔇 Music Off";
+    } else {
+      music.play().catch(() => {});
+      playing = true;
+      btn.innerHTML = "🔊 Music On";
+    }
+  }
+
+  /* ---------------------------
+      MOBILE MENU
+  --------------------------- */
+  function toggleMenu(){
+    let mobile = document.getElementById("mobileMenu");
+    mobile.style.display = mobile.style.display === "flex" ? "none" : "flex";
+  }
+</script>
+
+
+</body>
+</html>
